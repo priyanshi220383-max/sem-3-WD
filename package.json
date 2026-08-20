@@ -1,14 +1,17 @@
 {
-  "name": "myapp",
+  "name": "express",
   "version": "1.0.0",
-  "description": "this is my app",
-  "license": "ISC",
-  "author": "Priyanshi",
-  "type": "commonjs",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon app.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
   }
-
 }
