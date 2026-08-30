@@ -27,15 +27,6 @@
     "createdAt": "2026-08-28"
   },
   {
-    "id": 4,
-    "name": "Arjun Mehta",
-    "email": "arjun.mehta@example.com",
-    "password": "arjun456",
-    "phone": "9876543213",
-    "role": "user",
-    "createdAt": "2026-08-27"
-  },
-  {
     "id": 5,
     "name": "Kavya Verma",
     "email": "kavya.verma@example.com",
