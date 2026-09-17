@@ -48,6 +48,7 @@ const deleteUser = (id) => {
 
     if (index === -1) return false;
 
+
     users.splice(index, 1);
     fs.writeFileSync(userFilePath, JSON.stringify(users, null, 2), "utf-8");
     return true;

@@ -3,9 +3,9 @@ const userModel = require('../model/userModel');
 // GET all users
 const getAll = (req, res) => {
 
-    const users = userModel.getAll();
+    const user = userModel.getAll();
 
-    res.json(users);
+    res.json(user);
 };
 
 
