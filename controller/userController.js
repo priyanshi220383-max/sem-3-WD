@@ -1,20 +1,13 @@
 const userModel = require('../model/userModel');
 
-// GET all users
-const getAll = (req, res) => {
-
-    const user = userModel.getAll();
-
-    res.json(user);
+const getAll = async (req, res) => {
+    const users = await userModel.getAll();
+    res.json(users);
 };
 
-
-// GET user by ID
-const getById = (req, res) => {
-
+const getById = async (req, res) => {
     const id = Number(req.params.id);
-
-    const user = userModel.getById(id);
+    const user = await userModel.getById(id);
 
     if (user) {
         res.json(user);
@@ -25,13 +18,8 @@ const getById = (req, res) => {
     }
 };
 
-
-// POST create user
-const save = (req, res) => {
-
-    const newUser = req.body;
-
-    userModel.save(newUser);
+const save = async (req, res) => {
+    const newUser = await userModel.save(req.body);
 
     res.status(201).json({
         message: 'User created successfully',
@@ -39,20 +27,14 @@ const save = (req, res) => {
     });
 };
 
-
-// PUT update user
-const update = (req, res) => {
-
+const update = async (req, res) => {
     const id = Number(req.params.id);
+    const updatedUser = await userModel.update(id, req.body);
 
-    const updatedUser = req.body;
-
-    const user = userModel.update(id, updatedUser);
-
-    if (user) {
+    if (updatedUser) {
         res.json({
             message: 'User updated successfully',
-            user: user
+            user: updatedUser
         });
     } else {
         res.status(404).json({
@@ -61,13 +43,9 @@ const update = (req, res) => {
     }
 };
 
-
-// DELETE user
-const deleteUser = (req, res) => {
-
+const deleteUser = async (req, res) => {
     const id = Number(req.params.id);
-
-    const deleted = userModel.delete(id);
+    const deleted = await userModel.delete(id);
 
     if (deleted) {
         res.json({
@@ -79,7 +57,6 @@ const deleteUser = (req, res) => {
         });
     }
 };
-
 
 module.exports = {
     getAll,

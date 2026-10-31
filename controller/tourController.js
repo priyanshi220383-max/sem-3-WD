@@ -1,35 +1,60 @@
 const tourModel = require('../model/tourModel');
 
-const getAllPackages = (req, res) => {
-    const packages = tourModel.getAll();
+const getAllPackages = async (req, res) => {
+    const packages = await tourModel.getAll();
     res.json(packages);
 };
 
-const getPackageById = (req, res) => {
+const getPackageById = async (req, res) => {
     const id = Number(req.params.id);
-    const package = tourModel.getById(id);
+    const package = await tourModel.getById(id);
+
     if (package) {
         res.json(package);
     } else {
         res.status(404).json({ message: 'Package not found' });
     }
 };
-const createPackage = (req, res) => {
-    const newPackage = req.body;
-    tourModel.save(newPackage);
-    res.status(201).json({ message: 'Package created successfully' });
-}
-const updatePackage = (req, res) => {
-    const id = Number(req.params.id);
-    const updatedPackage = req.body;
-    tourModel.update(id, updatedPackage);
-    res.json({ message: 'Package updated successfully' });
+
+const createPackage = async (req, res) => {
+    const newPackage = await tourModel.save(req.body);
+
+    res.status(201).json({
+        message: 'Package created successfully',
+        package: newPackage
+    });
 };
-const deletePackage = (req, res) => {
+
+const updatePackage = async (req, res) => {
     const id = Number(req.params.id);
-    tourModel.delete(id);
-    res.json({ message: 'Package deleted successfully' });
-}
+    const updatedPackage = await tourModel.update(id, req.body);
+
+    if (updatedPackage) {
+        res.json({
+            message: 'Package updated successfully',
+            package: updatedPackage
+        });
+    } else {
+        res.status(404).json({
+            message: 'Package not found'
+        });
+    }
+};
+
+const deletePackage = async (req, res) => {
+    const id = Number(req.params.id);
+    const deleted = await tourModel.delete(id);
+
+    if (deleted) {
+        res.json({
+            message: 'Package deleted successfully'
+        });
+    } else {
+        res.status(404).json({
+            message: 'Package not found'
+        });
+    }
+};
 
 module.exports = {
     getAllPackages,
