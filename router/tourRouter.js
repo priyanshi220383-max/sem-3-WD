@@ -1,19 +1,11 @@
-const express = require('express');
-
+const express = require("express");
 const {
-    getAllPackages,
-    getPackageById,
-    createPackage,
-    updatePackage,
-    deletePackage
-} = require('../controller/tourController');
+    getAllPackages, getPackageById, createPackage, updatePackage, deletePackage
+} = require("../controller/tourController");
 
 const router = express.Router();
 
-router.get('/', getAllPackages);
-router.get('/:id', getPackageById);
-router.post('/', createPackage);
-router.put('/:id', updatePackage);
-router.delete('/:id', deletePackage);
+router.route("/").get(getAllPackages).post(createPackage);
+router.route("/:id").get(getPackageById).put(updatePackage).delete(deletePackage);
 
 module.exports = router;

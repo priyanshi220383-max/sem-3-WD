@@ -1,67 +1,67 @@
-const userModel = require('../model/userModel');
+const userModel = require("../model/userModel");
+
+const handleError = (res, error) => {
+    if (error.code === 11000) {
+        return res.status(400).json({ message: "Email already exists" });
+    }
+    const status = error.name === "ValidationError" ? 400 : 500;
+    res.status(status).json({ message: error.message });
+};
 
 const getAll = async (req, res) => {
-    const users = await userModel.getAll();
-    res.json(users);
+    try {
+        res.json(await userModel.getAll());
+    } catch (error) {
+        handleError(res, error);
+    }
 };
 
 const getById = async (req, res) => {
-    const id = Number(req.params.id);
-    const user = await userModel.getById(id);
+    try {
+        const id = Number(req.params.id);
+        if (Number.isNaN(id)) return res.status(400).json({ message: "Invalid id" });
 
-    if (user) {
+        const user = await userModel.getById(id);
+        if (!user) return res.status(404).json({ message: "User not found" });
         res.json(user);
-    } else {
-        res.status(404).json({
-            message: 'User not found'
-        });
+    } catch (error) {
+        handleError(res, error);
     }
 };
 
 const save = async (req, res) => {
-    const newUser = await userModel.save(req.body);
-
-    res.status(201).json({
-        message: 'User created successfully',
-        user: newUser
-    });
+    try {
+        const user = await userModel.save(req.body);
+        res.status(201).json({ message: "User created successfully", user });
+    } catch (error) {
+        handleError(res, error);
+    }
 };
 
 const update = async (req, res) => {
-    const id = Number(req.params.id);
-    const updatedUser = await userModel.update(id, req.body);
+    try {
+        const id = Number(req.params.id);
+        if (Number.isNaN(id)) return res.status(400).json({ message: "Invalid id" });
 
-    if (updatedUser) {
-        res.json({
-            message: 'User updated successfully',
-            user: updatedUser
-        });
-    } else {
-        res.status(404).json({
-            message: 'User not found'
-        });
+        const user = await userModel.update(id, req.body);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json({ message: "User updated successfully", user });
+    } catch (error) {
+        handleError(res, error);
     }
 };
 
 const deleteUser = async (req, res) => {
-    const id = Number(req.params.id);
-    const deleted = await userModel.delete(id);
+    try {
+        const id = Number(req.params.id);
+        if (Number.isNaN(id)) return res.status(400).json({ message: "Invalid id" });
 
-    if (deleted) {
-        res.json({
-            message: 'User deleted successfully'
-        });
-    } else {
-        res.status(404).json({
-            message: 'User not found'
-        });
+        const deleted = await userModel.delete(id);
+        if (!deleted) return res.status(404).json({ message: "User not found" });
+        res.json({ message: "User deleted successfully" });
+    } catch (error) {
+        handleError(res, error);
     }
 };
 
-module.exports = {
-    getAll,
-    getById,
-    save,
-    update,
-    deleteUser
-};
+module.exports = { getAll, getById, save, update, deleteUser };

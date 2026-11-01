@@ -1,83 +1,28 @@
-const { getDB } = require("../config/db");
+const User = require("./User");
 
-const getAll = async () => {
-    const db = getDB();
+const hidden = "-_id -__v";
 
-    return await db
-        .collection("users")
-        .find({}, { projection: { _id: 0 } })
-        .toArray();
-};
+const getAll = async () => User.find().select(hidden).lean();
 
-const getById = async (id) => {
-    const db = getDB();
-
-    return await db
-        .collection("users")
-        .findOne(
-            { id: Number(id) },
-            { projection: { _id: 0 } }
-        );
-};
+const getById = async (id) => User.findOne({ id }).select(hidden).lean();
 
 const save = async (newUser) => {
-    const db = getDB();
-
-    const lastUser = await db
-        .collection("users")
-        .find()
-        .sort({ id: -1 })
-        .limit(1)
-        .toArray();
-
-    const newId = lastUser.length > 0
-        ? lastUser[0].id + 1
-        : 1;
-
-    const userToSave = {
-        ...newUser,
-        id: newId
-    };
-
-    await db.collection("users").insertOne(userToSave);
-
-    return userToSave;
+    const last = await User.findOne().sort({ id: -1 }).select("id").lean();
+    const newId = last ? last.id + 1 : 1;
+    await User.create({ ...newUser, id: newId });
+    return getById(newId);
 };
 
 const update = async (id, updatedData) => {
-    const db = getDB();
-
-    const result = await db.collection("users").updateOne(
-        { id: Number(id) },
-        {
-            $set: {
-                ...updatedData,
-                id: Number(id)
-            }
-        }
-    );
-
-    if (result.matchedCount === 0) {
-        return null;
-    }
-
-    return await getById(id);
+    const { id: ignored, ...data } = updatedData;
+    return User.findOneAndUpdate({ id }, data, { new: true, runValidators: true })
+        .select(hidden)
+        .lean();
 };
 
 const deleteUser = async (id) => {
-    const db = getDB();
-
-    const result = await db.collection("users").deleteOne({
-        id: Number(id)
-    });
-
+    const result = await User.deleteOne({ id });
     return result.deletedCount > 0;
 };
 
-module.exports = {
-    getAll,
-    getById,
-    save,
-    update,
-    delete: deleteUser
-};
+module.exports = { getAll, getById, save, update, delete: deleteUser };

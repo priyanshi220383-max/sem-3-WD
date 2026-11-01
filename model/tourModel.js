@@ -1,80 +1,28 @@
-const { getDB } = require("../config/db");
+const Tour = require("./Tour");
 
-const getAll = async () => {
-    const db = getDB();
+const hidden = "-_id -__v";
 
-    return await db
-        .collection("tours")
-        .find({}, { projection: { _id: 0 } })
-        .toArray();
-};
+const getAll = async () => Tour.find().select(hidden).lean();
 
-const getById = async (id) => {
-    const db = getDB();
-
-    return await db
-        .collection("tours")
-        .findOne(
-            { id: Number(id) },
-            { projection: { _id: 0 } }
-        );
-};
+const getById = async (id) => Tour.findOne({ id }).select(hidden).lean();
 
 const save = async (newPackage) => {
-    const db = getDB();
-
-    const lastPackage = await db
-        .collection("tours")
-        .find()
-        .sort({ id: -1 })
-        .limit(1)
-        .toArray();
-
-    const newId = lastPackage.length > 0
-        ? lastPackage[0].id + 1
-        : 1;
-
-    const packageToSave = {
-        ...newPackage,
-        id: newId
-    };
-
-    await db.collection("tours").insertOne(packageToSave);
-
-    return packageToSave;
+    const last = await Tour.findOne().sort({ id: -1 }).select("id").lean();
+    const newId = last ? last.id + 1 : 1;
+    await Tour.create({ ...newPackage, id: newId });
+    return getById(newId);
 };
 
 const update = async (id, updatedPackage) => {
-    const db = getDB();
-
-    const result = await db.collection("tours").updateOne(
-        { id: Number(id) },
-        {
-            $set: updatedPackage
-        }
-    );
-
-    if (result.matchedCount === 0) {
-        return null;
-    }
-
-    return await getById(id);
+    const { id: ignored, ...data } = updatedPackage; // id badalne mat do
+    return Tour.findOneAndUpdate({ id }, data, { new: true, runValidators: true })
+        .select(hidden)
+        .lean();
 };
 
 const deletePackage = async (id) => {
-    const db = getDB();
-
-    const result = await db.collection("tours").deleteOne({
-        id: Number(id)
-    });
-
+    const result = await Tour.deleteOne({ id });
     return result.deletedCount > 0;
 };
 
-module.exports = {
-    getAll,
-    getById,
-    save,
-    update,
-    delete: deletePackage
-};
+module.exports = { getAll, getById, save, update, delete: deletePackage };
